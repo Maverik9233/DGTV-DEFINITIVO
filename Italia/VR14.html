@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>VR14</title>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<style>
+  body {
+    background: #000;
+    color: #fff;
+    text-align: center;
+    margin: 0;
+  }
+  h1 {
+    font-family: sans-serif;
+    font-size: 20px;
+    margin: 10px 0;
+  }
+  video {
+    width: 720px;
+    height: 480px;
+    border: none;
+  }
+</style>
+</head>
+<body>
+  <h1>VR14</h1>
+  <video id="video" controls autoplay></video>
+
+  <script>
+    const video = document.getElementById('video');
+    const videoSrc = 'https://streamcdng10-57214cb172d84f8cb311b91513952b03.msvdn.net/live/S40896499/ZuaLjACsWIL4/chunklist_b864000.m3u8'; // 👈 il tuo link m3u8
+
+    if (Hls.isSupported()) {
+      const hls = new Hls();
+      hls.loadSource(videoSrc);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, function() {
+        video.play();
+      });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      // Safari supporta HLS nativamente
+      video.src = videoSrc;
+      video.play();
+    }
+  </script>
+</body>
+</html>

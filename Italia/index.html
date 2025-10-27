@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Streaming Live DGTV</title>
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #0d0d0d, #1a1a1a);
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+    header {
+      text-align: center;
+      padding: 20px;
+      background: #111;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+      letter-spacing: 1px;
+    }
+    .filters {
+      margin-top: 15px;
+    }
+    .filters input, .filters select {
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: none;
+      margin: 0 5px;
+      font-size: 0.9rem;
+      background: #222;
+      color: #fff;
+    }
+    .filters input::placeholder {
+      color: #aaa;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+      padding: 30px;
+    }
+    .card {
+      background: #222;
+      border-radius: 12px;
+      padding: 15px;
+      text-align: center;
+      text-decoration: none;
+      color: #fff;
+      transition: transform 0.2s, background 0.2s, box-shadow 0.3s;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .card:hover {
+      transform: scale(1.05);
+      background: #333;
+      box-shadow: 0 0 10px rgba(255,255,255,0.2);
+    }
+    .card img {
+      width: 100%;
+      max-width: 140px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    .card h2 {
+      margin: 0 0 10px 0;
+      font-size: 1rem;
+    }
+    /* EPG */
+    .epg {
+      background: #111;
+      color: #fff;
+      text-align: left;
+      width: 100%;
+      border-radius: 6px;
+      padding: 8px;
+      margin-top: 5px;
+      font-size: 0.85rem;
+    }
+    .epg div.time {
+      color: #aaa;
+      display: inline-block;
+      width: 45px;
+    }
+    .epg div.current {
+      background: #333;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+    /* Messaggio "nessun risultato" */
+    #noResults {
+      text-align: center;
+      color: #aaa;
+      margin-top: 20px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📺Streaming Live DGTV</h1>
+    <div class="filters">
+      <input type="text" id="search" placeholder="Cerca per nome...">
+      <select id="countryFilter">
+        <option value="all">Tutte le nazioni</option>
+        <option value="italia">Italia</option>
+        <option value="francia">Francia</option>
+        <option value="spagna">Spagna</option>
+        <option value="uk">UK</option>
+        <option value="germania">Germania</option>
+        <option value="svizzera">Svizzera</option>
+        <option value="argentina">Argentina</option>
+        <option value="brasile">Brasile</option>
+        <option value="usa">USA</option>
+        <option value="portogallo">Portogallo</option>
+        <option value="romania">Romania</option>
+        <option value="olanda">Olanda</option>
+        <option value="other">Other</option>
+      </select>
+      <select id="genreFilter">
+        <option value="all">Tutti i generi</option>
+        <option value="sport">Sport</option>
+        <option value="intrattenimento">Intrattenimento</option>
+        <option value="cinema">Cinema</option>
+        <option value="cartoons">Cartoons</option>
+        <option value="news">News</option>
+        <option value="musica">Musica</option>
+        <option value="indefinito">Indefinito</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+  </header>
+
+  <div class="grid" id="channelGrid">
+   <!-- Rai 1 -->
+<a href="Rai1.html" class="card" data-name="Rai 1 HD" data-country="italia" data-genre="intrattenimento">
+  <img src="logos/Rai1.png" alt="Rai 1 HD">
+  <h2>Rai 1 HD</h2>
+</a>
+
+<!-- Rai 2 -->
+<a href="Rai2.html" class="card" data-name="Rai 2 HD" data-country="italia" data-genre="intrattenimento">
+  <img src="logos/Rai2.png" alt="Rai 2 HD">
+  <h2>Rai 2 HD</h2>
+</a>
+
+<!-- Rai 3 -->
+<a href="Rai3.html" class="card" data-name="Rai 3 HD" data-country="italia" data-genre="intrattenimento">
+  <img src="logos/Rai3.png" alt="Rai 3 HD">
+  <h2>Rai 3 HD</h2>
+</a>
+
+<!-- Rete 4 -->
+<a href="Rete4.html" class="card" data-name="Rete 4 HD" data-country="italia" data-genre="intrattenimento">
+  <img src="logos/Rete4.png" alt="Rete 4 HD">
+  <h2>Rete 4 HD</h2>
+</a>
+
+<!-- Canale 5 -->
+<a href="Canale5.html" class="card" data-name="Canale 5 HD" data-country="italia" data-genre="intrattenimento">
+  <img src="logos/Canale5.png" alt="Canale 5 HD">
+  <h2>Canale 5 HD</h2>
+</a>
+
+<!-- Italia 1 -->
+<a href="Italia1.html" class="card" data-name="Italia 1 HD" data-country="italia" data-genre="intrattenimento">
+  <img src="logos/Italia1.png" alt="Italia 1 HD">
+  <h2>Italia 1 HD</h2>
+</a>
+
+<!-- La7 -->
+<a href="La7.html" class="card" data-name="La7 HD" data-country="italia" data-genre="intrattenimento">
+  <img src="logos/La7.png" alt="La7 HD">
+  <h2>La7 HD</h2>
+</a>
+
+<!-- TV8 -->
+<a href="Tv8.html" class="card" data-name="TV8 HD" data-country="italia" data-genre="intrattenimento">
+  <img src="logos/Tv8.png" alt="TV8 HD">
+  <h2>TV8 HD</h2>
+</a>
+
+<!-- Nove -->
+<a href="Nove.html" class="card" data-name="Nove HD" data-country="italia" data-genre="intrattenimento">
+  <img src="logos/Nove.png" alt="Nove HD">
+  <h2>Nove HD</h2>
+</a>
+
+<!-- Telecolor International -->
+<a href="Telecolor.html" class="card" data-name="Telecolor International" data-country="italia" data-genre="indefinito">
+  <img src="logos/telecolor.png" alt="Telecolor International">
+  <h2>Telecolor International</h2>
+</a>
+
+<!-- Antenna Sicilia -->
+<a href="AntennaSicilia.html" class="card" data-name="Antenna Sicilia" data-country="italia" data-genre="indefinito">
+  <img src="logos/antennasicilia.png" alt="Antenna Sicilia">
+  <h2>Antenna Sicilia</h2>
+</a>
+
+<!-- Video Regione 14 -->
+<a href="VR14.html" class="card" data-name="Video Regione 14" data-country="italia" data-genre="indefinito">
+  <img src="logos/VR14.png" alt="VR14">
+  <h2>VR14</h2>
+</a>
+
+<!-- Sestarete sicilia -->
+<a href="sestarete.html" class="card" data-name="7 Gold" data-country="italia" data-genre="indefinito">
+  <img src="logos/sestarete.png" alt="Sestarete">
+  <h2>Sestarete</h2>
+</a>
+
+    <!-- Etna Channel -->
+<a href="Etnachannel.html" class="card" data-country="italia" data-genre="indefinito">
+  <img src="logos/etnachannel.png" alt="Etna Channel">
+  <h2>Etna Channel</h2>
+</a>
+
+<!-- In Sicilia -->
+<a href="insicilia.html" class="card" data-country="italia" data-genre="indefinito">
+  <img src="logos/insicilia.png" alt="In Sicilia">
+  <h2>In Sicilia</h2>
+</a>
+
+<!-- Sicilia242 -->
+<a href="sicilia242.html" class="card" data-country="italia" data-genre="indefinito">
+  <img src="logos/sicilia24.png" alt="Sicilia242">
+  <h2>Sicilia242</h2>
+</a>
+
+<!-- TVR Xenon -->
+<a href="tvrxenon.html" class="card" data-country="italia" data-genre="indefinito">
+  <img src="logos/tvrxenon.png" alt="TVR Xenon">
+  <h2>TVR Xenon</h2>
+</a>
+
+<!-- Rei TV -->
+<a href="reitv.html" class="card" data-country="italia" data-genre="indefinito">
+  <img src="logos/reitv.png" alt="Rei TV">
+  <h2>Rei TV</h2>
+</a>
+
+<!-- 20 Mediaset -->
+<a href="20.html" class="card" data-country="italia" data-genre="intrattenimento">
+  <img src="logos/20.png" alt="20 Mediaset">
+  <h2>20 Mediaset</h2>
+</a>
+
+<!-- Rai 4 HD -->
+<a href="rai4.html" class="card" data-country="italia" data-genre="intrattenimento">
+  <img src="logos/Rai4.png" alt="Rai 4 HD">
+  <h2>Rai 4 HD</h2>
+</a>
+
+<!-- Iris HD -->
+<a href="Iris.html" class="card" data-country="italia" data-genre="cinema">
+  <img src="logos/Iris.png" alt="Iris HD">
+  <h2>Iris HD</h2>
+</a>
+
+<!-- Rai 5 HD -->
+<a href="rai5.html" class="card" data-country="italia" data-genre="intrattenimento">
+  <img src="logos/Rai5.png" alt="Rai 5 HD">
+  <h2>Rai 5 HD</h2>
+</a>
+
+<!-- Rai Movie HD -->
+<a href="raimovie.html" class="card" data-country="italia" data-genre="cinema">
+  <img src="logos/Raimovie.png" alt="Rai Movie HD">
+  <h2>Rai Movie HD</h2>
+</a>
+
+<!-- Rai Premium HD -->
+<a href="raipremium.html" class="card" data-country="italia" data-genre="intrattenimento">
+  <img src="logos/Raipremium.png" alt="Rai Premium HD">
+  <h2>Rai Premium HD</h2>
+</a>
+
+<!-- Cielo HD -->
+<a href="cielo.html" class="card" data-country="italia" data-genre="intrattenimento">
+  <img src="logos/cielo.png" alt="Cielo HD">
+  <h2>Cielo HD</h2>
+</a>
+
+<!-- 27 Twentyseven -->
+<a href="27.html" class="card" data-country="italia" data-genre="intrattenimento">
+  <img src="logos/27.png" alt="27 Twentyseven">
+  <h2>27 Twentyseven</h2>
+</a>
+
+<!-- TV 2000 -->
+<a href="tv2000.html" class="card" data-country="italia" data-genre="indefinito">
+  <img src="logos/tv2000.png" alt="TV 2000">
+  <h2>TV 2000</h2>
+</a>
+
+<!-- La7 Cinema -->
+<a href="la7cinema.html" class="card" data-country="italia" data-genre="cinema">
+  <img src="logos/La7Cinema.png" alt="La7 Cinema">
+  <h2>La7 Cinema</h2>
+</a>
+
+<!-- RSI LA1 -->
+<a href="RSILA1.html" class="card" data-country="svizzera" data-genre="intrattenimento">
+  <img src="logos/RSILA1.png" alt="RSI LA1">
+  <h2>RSI LA1</h2>
+</a>
+
+<!-- RSI LA2 -->
+<a href="RSILA2.html" class="card" data-country="svizzera" data-genre="intrattenimento">
+  <img src="logos/RSILA2.png" alt="RSI LA2">
+  <h2>RSI LA2</h2>
+</a>
+
+   <!-- Italia 2 Mediaset -->
+<a href="Italia2.html" class="card" data-country="italia" data-genre="intrattenimento">
+  <img src="logos/Italia2.png" alt="Italia 2 HD">
+  <h2>Italia 2 HD</h2>
+</a>
+
+<!-- Topcalcio24 -->
+<a href="Topcalcio24.html" class="card" data-country="italia" data-genre="news">
+  <img src="logos/topcalcio24.png" alt="Topcalcio24">
+  <h2>Topcalcio24</h2>
+</a>
+
+<!-- Rai Italia -->
+<a href="raiitalia.html" class="card" data-country="italia" data-genre="indefinito">
+  <img src="logos/raiitalia.png" alt="Rai Italia">
+  <h2>Rai Italia</h2>
+</a>
+
+<!-- Boing -->
+<a href="boing.html" class="card" data-country="italia" data-genre="cartoons">
+  <img src="logos/boing.png" alt="Boing">
+  <h2>Boing</h2>
+</a>
+
+<!-- Boing Plus -->
+<a href="boingplus.html" class="card" data-country="italia" data-genre="cartoons">
+  <img src="logos/boingplus.png" alt="Boing Plus">
+  <h2>Boing Plus</h2>
+</a>
+
+<!-- Grande Fratello 1 -->
+<a href="gf1.html" class="card" data-country="italia" data-genre="other">
+  <img src="logos/gf.png" alt="GF Regia 1">
+  <h2>GF Regia 1</h2>
+</a>
+
+<!-- Grande Fratello 2 -->
+<a href="gf2.html" class="card" data-country="italia" data-genre="other">
+  <img src="logos/gf.png" alt="GF Regia 2">
+  <h2>GF Regia 2</h2>
+</a>
+
+<!-- Grande Fratello 3 -->
+<a href="gf3.html" class="card" data-country="italia" data-genre="other">
+  <img src="logos/gf.png" alt="GF 1 ora fa">
+  <h2>GF 1 ora fa</h2>
+</a>
+
+<!-- Discovery Channel -->
+<a href="discoverych.html" class="card" data-country="italia" data-genre="other">
+  <img src="logos/discovery.png" alt="Discovery Channel">
+  <h2>Discovery Channel</h2>
+</a>
+
+<!-- Gambero Rosso -->
+<a href="gambero.html" class="card" data-country="italia" data-genre="other">
+  <img src="logos/gambero.png" alt="Gambero Rosso">
+  <h2>Gambero Rosso</h2>
+</a>
+  
+<!-- Rai world premium -->
+<a href="raiwpremium.html" class="card" data-country="italia" data-genre="Intrattenimento">
+  <img src="logos/wpremium.png" alt="Rai world premium">
+  <h2>Rai world premium</h2>
+</a>
+    
+<!-- Rai sport -->
+<a href="raisport.html" class="card" data-country="italia" data-genre="Sport">
+  <img src="logos/rsport.png" alt="Rai sport HD">
+  <h2>Rai sport HD</h2>
+</a>
+    
+    <!-- Rai Gulp -->
+<a href="raigulp.html" class="card" data-country="italia" data-genre="cartoons">
+  <img src="logos/rgulp.png" alt="Rai Gulp HD">
+  <h2>Rai Gulp HD</h2>
+</a>
+    
+    <!-- Rai Yoyo -->
+<a href="raiyoyo.html" class="card" data-country="italia" data-genre="cartoons">
+  <img src="logos/ryoyo.png" alt="Rai Yoyo HD">
+  <h2>Rai Yoyo HD</h2>
+</a>
+    
+    <!-- Rai news -->
+<a href="rainews.html" class="card" data-country="italia" data-genre="News">
+  <img src="logos/rnews.png" alt="Rai News HD">
+  <h2>Rai News HD</h2>
+</a>
+    
+    <!-- La5 -->
+<a href="la5.html" class="card" data-country="italia" data-genre="Intrattenimento">
+  <img src="logos/la5.png" alt="La 5 HD">
+  <h2>La 5 HD</h2>
+</a>
+    
+    <!-- Cine34 -->
+<a href="cine34.html" class="card" data-country="italia" data-genre="Intrattenimento">
+  <img src="logos/cine34.png" alt="Cine34 HD">
+  <h2>Cine34 HD</h2>
+</a>
+    
+    <!-- Focus -->
+<a href="focus.html" class="card" data-country="italia" data-genre="Intrattenimento">
+  <img src="logos/focus.png" alt="Focus HD">
+  <h2>Focus HD</h2>
+</a>
+    
+    <!-- Top crime -->
+<a href="topcrime.html" class="card" data-country="italia" data-genre="Intrattenimento">
+  <img src="logos/topcrime.png" alt="Top CRime HD">
+  <h2>Top Crime HD</h2>
+</a>
+    
+<!-- tgcom24 -->
+<a href="tgcom24.html" class="card" data-country="italia" data-genre="Intrattenimento">
+  <img src="logos/tgcom.png" alt="TGCom24 HD">
+  <h2>TGCom24 HD</h2>
+</a>
+    
+    <!-- Mediaset Extra -->
+<a href="mextra.html" class="card" data-country="italia" data-genre="Intrattenimento">
+  <img src="logos/mextra.png" alt="Mediaset Extra HD">
+  <h2>Mediaset Extra HD</h2>
+</a>
+    
+<!-- Real time -->
+<a href="realtime.html" class="card" data-country="italia" data-genre="Intrattenimento">
+  <img src="logos/rtime.png" alt="REal Time HD">
+  <h2>Real Time HD</h2>
+</a>
+    
+    <!-- Giallo -->
+<a href="giallo.html" class="card" data-country="italia" data-genre="Intrattenimento">
+  <img src="logos/giallo.png" alt="Giallo HD">
+  <h2>Mediaset Extra Giallo HD</h2>
+</a>
+    
+    <!-- motor trend-->
+<a href="motortrend.html" class="card" data-country="italia" data-genre="Sport">
+  <img src="logos/mtrend.png" alt="Motor Trend HD">
+  <h2>Motor Trend HD</h2>
+</a>
+    
+<!-- Fishing TV -->
+<a href="fishing.html" class="card" data-country="italia" data-genre="Intrattenimento">
+  <img src="logos/fishing.png" alt="Fishing TV HD">
+  <h2>Fishing TV HD</h2>
+</a>
+    
+<!-- Rai storia -->
+<a href="raistoria.html" class="card" data-country="italia" data-genre="Intrattenimento">
+  <img src="logos/rstoria.png" alt="Rai storia HD">
+  <h2>Rai storia HD</h2>
+</a>
+    
+    <!-- skytg24 -->
+<a href="skytg24.html" class="card" data-country="italia" data-genre="News">
+  <img src="logos/skytg24.png" alt="Sky TG24 HD">
+  <h2>Sky TG24 HD</h2>
+</a>
+    
+<!-- Rai scuola -->
+<a href="raiscuola.html" class="card" data-country="italia" data-genre="Intrattenimento">
+  <img src="logos/rscuola.png" alt="Rai scuola HD">
+  <h2>Rai scuola HD</h2>
+</a>
+
+    <!-- HGTV -->
+<a href="hgtv.html" class="card" data-country="italia" data-genre="Intrattenimento">
+  <img src="logos/hgtv.png" alt="HGTV HD">
+  <h2>HGTV HD</h2>
+</a>
+
+    <!-- K2 -->
+<a href="k2.html" class="card" data-country="italia" data-genre="Cartoons">
+  <img src="logos/k2.png" alt="K2 HD">
+  <h2>K2 HD</h2>
+</a>
+
+    <!-- Dmax -->
+<a href="dmax.html" class="card" data-country="italia" data-genre="Intrattenimento">
+  <img src="logos/dmax.png" alt="Dmax HD">
+  <h2>Dmax HD</h2>
+</a>
+    
+  </div>
+
+  <p id="noResults" style="display:none;">😕 Nessun canale trovato.</p>
+
+  <script>
+    const searchInput = document.getElementById('search');
+    const countryFilter = document.getElementById('countryFilter');
+    const genreFilter = document.getElementById('genreFilter');
+    const cards = document.querySelectorAll('.card');
+    const noResultsMsg = document.getElementById('noResults');
+
+    function filterChannels() {
+      const searchText = searchInput.value.trim().toLowerCase();
+      const country = countryFilter.value;
+      const genre = genreFilter.value;
+      let visibleCount = 0;
+
+      cards.forEach(card => {
+        const name = card.dataset.name.toLowerCase();
+        const cardCountry = card.dataset.country;
+        const cardGenre = card.dataset.genre;
+
+        const matchesSearch = name.includes(searchText);
+        const matchesCountry = country === 'all' || cardCountry === country;
+        const matchesGenre = genre === 'all' || cardGenre === genre;
+
+        if (matchesSearch && matchesCountry && matchesGenre) {
+          card.style.display = 'flex';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      noResultsMsg.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+
+    searchInput.addEventListener('input', filterChannels);
+    countryFilter.addEventListener('change', filterChannels);
+    genreFilter.addEventListener('change', filterChannels);
+
+    // --- EPG Online ---
+    async function loadEPG() {
+      try {
+        const response = await fetch('https://iptv-org.github.io/epg/guides/it.xml');
+        const text = await response.text();
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(text, "text/xml");
+        const programs = xmlDoc.getElementsByTagName('programme');
+
+        document.querySelectorAll('.epg').forEach(epgDiv => {
+          const channelName = epgDiv.dataset.channel;
+          const now = new Date();
+          let count = 0;
+          let epgText = '';
+
+          for (let prog of programs) {
+            const progChannel = prog.getAttribute('channel');
+            const start = new Date(prog.getAttribute('start').substring(0, 12).replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})/, '$1-$2-$3T$4:$5'));
+            const stop = new Date(prog.getAttribute('stop').substring(0, 12).replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})/, '$1-$2-$3T$4:$5'));
+            const titleNode = prog.getElementsByTagName('title')[0];
+            const title = titleNode ? titleNode.textContent : '';
+
+            if (progChannel.toLowerCase().includes(channelName.toLowerCase()) && count < 3) {
+              if (now >= start && now <= stop) {
+                epgText += `<div class="current"><span class="time">${start.getHours()}:${String(start.getMinutes()).padStart(2,'0')}</span> ▶ ${title}</div>`;
+                count++;
+              } else if (start > now) {
+                epgText += `<div><span class="time">${start.getHours()}:${String(start.getMinutes()).padStart(2,'0')}</span> ${title}</div>`;
+                count++;
+              }
+            }
+          }
+
+          epgDiv.innerHTML = epgText || 'Nessuna informazione disponibile';
+        });
+      } catch (error) {
+        console.error('Errore caricamento EPG:', error);
+        document.querySelectorAll('.epg').forEach(epgDiv => {
+          epgDiv.innerHTML = 'Errore caricamento EPG';
+        });
+      }
+    }
+
+    loadEPG();
+  </script>
+</body>
+</html>

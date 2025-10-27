@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Cine34 HD</title>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<style>
+  body {
+    background: #000;
+    color: #fff;
+    text-align: center;
+    margin: 0;
+    font-family: Arial, sans-serif;
+  }
+
+  h1 {
+    font-size: 22px;
+    margin: 15px 10px 10px 10px;
+    color: #00bfff;
+    text-shadow: 0 0 10px rgba(0,191,255,0.6);
+  }
+
+  video, iframe.stream {
+    width: 720px;
+    height: 480px;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(255,255,255,0.3);
+    margin-bottom: 20px;
+  }
+
+  .epg-container {
+    width: 720px;
+    height: 400px;
+    margin: 0 auto 40px auto;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 0 15px rgba(0,191,255,0.3);
+  }
+
+  .epg-frame {
+    width: 100%;
+    height: 1200px; /* Aumenta se vuoi vedere più programmi */
+    border: none;
+    position: absolute;
+    top: -360px; /* Centra la programmazione */
+    left: 0;
+    transform: scale(1.02);
+  }
+
+</style>
+</head>
+<body>
+  <h1>Cine34 HD</h1>
+
+  <!-- STREAM VIDEO UNIVERSALE -->
+  <!-- Scegli tra video HLS/DASH o iframe PHP -->
+  <video id="video" controls autoplay></video>
+  <!-- <iframe class="stream" src="INSERISCI_LINK_PHP_O_ALTRO" allowfullscreen></iframe> -->
+
+  <script>
+    const video = document.getElementById('video');
+    const videoSrc = 'https://juventusonair.com/channels/11.php'; // Inserisci il tuo link .m3u8, .mpd, ts ecc.
+
+    // Se è un HLS o MPD
+    if (videoSrc.endsWith('.m3u8') && Hls.isSupported()) {
+      const hls = new Hls();
+      hls.loadSource(videoSrc);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+    } else if (videoSrc.endsWith('.mpd') && window.dashjs) {
+      const player = dashjs.MediaPlayer().create();
+      player.initialize(video, videoSrc, true);
+    } else {
+      // fallback iframe o compatibilità browser nativa
+      video.src = videoSrc;
+      video.play();
+    }
+  </script>
+
+  <!-- GUIDA TV CENTRATA -->
+  <div class="epg-container">
+    <iframe class="epg-frame" src="https://www.superguidatv.it/programmazione-canale/oggi/guida-programmi-tv-cine34/574/"></iframe>
+  </div>
+</body>
+</html>

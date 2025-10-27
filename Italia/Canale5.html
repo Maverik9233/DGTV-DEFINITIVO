@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Canale 5 HD</title>
+<style>
+  body {
+    background: #000;
+    color: #fff;
+    text-align: center;
+    margin: 0;
+    font-family: Arial, sans-serif;
+  }
+
+  h1 {
+    margin: 15px 0 5px 0;
+    font-size: 22px;
+  }
+
+  /* Player video */
+  iframe.stream {
+    width: 80%;
+    max-width: 720px;
+    height: 480px;
+    border: none;
+    box-shadow: 0 0 10px rgba(255,255,255,0.2);
+    border-radius: 10px;
+  }
+
+  /* Sezione guida */
+  .epg-section {
+    margin-top: 25px;
+    color: #fff;
+  }
+
+  .epg-section h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #00bfff;
+  }
+
+  .epg-container {
+    width: 90%;
+    max-width: 720px;
+    height: 600px;
+    margin: 0 auto 40px auto;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 0 15px rgba(0,191,255,0.3);
+  }
+
+  .epg-frame {
+    width: 100%;
+    height: 1300px; /* pagina più lunga per permettere il crop */
+    border: none;
+    position: absolute;
+    top: -380px; /* centratura per far vedere solo la parte della programmazione */
+    left: 0;
+    transform: scale(1.02);
+  }
+</style>
+</head>
+<body>
+  <h1>Canale 5 HD</h1>
+
+  <!-- Player video -->
+  <iframe class="stream" src="https://juventusonair.com/lv/it/5.php" allowfullscreen></iframe>
+
+  <!-- Guida TV -->
+  <div class="epg-section">
+    <h2>📺 Guida TV – Canale 5 HD</h2>
+    <div class="epg-container">
+      <iframe class="epg-frame" src="https://www.superguidatv.it/programmazione-canale/oggi/guida-programmi-tv-canale-5/187/"></iframe>
+    </div>
+  </div>
+</body>
+</html>
