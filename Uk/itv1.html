@@ -2,7 +2,7 @@
 <html lang="Uk">
 <head>
 <meta charset="UTF-8">
-<title> ITV 1</title>       nome canale tv
+<title> ITV 1</title>     
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <style>
   body {
@@ -52,7 +52,7 @@
 </style>
 </head>
 <body>
-  <h1>ITV 1 </h1> nome canale tv
+  <h1>ITV 1 </h1> 
 
   <!-- STREAM VIDEO UNIVERSALE -->
   <!-- Scegli tra video HLS/DASH o iframe PHP -->
@@ -61,7 +61,7 @@
 
   <script>
     const video = document.getElementById('video');
-    const videoSrc = 'https://www.livehdtv.com/embed/itv1/'; // Inserisci il tuo link .m3u8, .mpd, ts ecc.
+    const videoSrc = 'https://livetvde.net/itv1/index.m3u8?token=1a1a0160c436a649e21ca298cc1805efb934f608-6c15c7a02f9a7b06451bfc511b85a493-1761611785-1761600985'; // Inserisci il tuo link .m3u8, .mpd, ts ecc.
 
     // Se è un HLS o MPD
     if (videoSrc.endsWith('.m3u8') && Hls.isSupported()) {
@@ -84,4 +84,5 @@
     <iframe class="epg-frame" src="https://www.itv.com/watch/tv-guide/2025-10-27"></iframe>
   </div>
 </body>
+
 </html>
