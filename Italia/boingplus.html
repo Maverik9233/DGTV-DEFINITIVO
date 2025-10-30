@@ -1,47 +1,65 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<title>Boing Plus</title>
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-<style>
-  body {
-    background: #000;
-    color: #fff;
-    text-align: center;
-    margin: 0;
-  }
-  h1 {
-    font-family: sans-serif;
-    font-size: 20px;
-    margin: 10px 0;
-  }
-  video {
-    width: 720px;
-    height: 480px;
-    border: none;
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Boing Plus</title>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <style>
+    body {
+      background: #000;
+      color: #fff;
+      text-align: center;
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin: 20px 0;
+    }
+
+    video {
+      width: 90%;
+      max-width: 720px;
+      height: auto;
+      border: none;
+      outline: none;
+      background: #000;
+    }
+  </style>
 </head>
 <body>
   <h1>Boing Plus</h1>
-  <video id="video" controls autoplay></video>
+  <video id="video" controls autoplay muted playsinline></video>
 
   <script>
     const video = document.getElementById('video');
-    const videoSrc = 'https://uvotv.zappr.stream/101.m3u8'; // 👈 il tuo link m3u8
+    const videoSrc = 'https://uvotv.zappr.stream/101.m3u8'; // 🔗 Sorgente HLS
 
     if (Hls.isSupported()) {
-      const hls = new Hls();
+      const hls = new Hls({
+        debug: false,
+      });
       hls.loadSource(videoSrc);
       hls.attachMedia(video);
-      hls.on(Hls.Events.MANIFEST_PARSED, function() {
-        video.play();
+
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        video.play().catch(err => console.warn('Riproduzione automatica bloccata:', err));
       });
+
+      hls.on(Hls.Events.ERROR, (event, data) => {
+        console.error('Errore HLS:', data);
+      });
+
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
       // Safari supporta HLS nativamente
       video.src = videoSrc;
-      video.play();
+      video.addEventListener('loadedmetadata', () => {
+        video.play().catch(err => console.warn('Autoplay bloccato:', err));
+      });
+    } else {
+      alert('Il tuo browser non supporta la riproduzione HLS.');
     }
   </script>
 </body>
