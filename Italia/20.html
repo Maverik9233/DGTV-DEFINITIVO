@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <title>20 Mediaset</title>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
 <style>
   body {
     background: #000;
@@ -13,43 +15,72 @@
   }
 
   h1 {
-    margin: 15px 0 5px 0;
-    font-size: 22px;
-  }
-
-  /* Player video */
-  iframe.stream {
-    width: 80%;
-    max-width: 720px;
-    height: 480px;
-    border: none;
-    box-shadow: 0 0 10px rgba(255,255,255,0.2);
-    border-radius: 10px;
-  }
-
-  /* Sezione guida */
-  .epg-section {
-    margin-top: 25px;
-    color: #fff;
-  }
-
-  .epg-section h2 {
-    font-size: 20px;
-    margin-bottom: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
+    margin: 15px 0 10px 0;
+    font-size: 26px;
     color: #00bfff;
+    text-shadow: 0 0 10px rgba(0,191,255,0.6);
   }
 
+  img.logo {
+    width: 200px;
+    max-width: 30%;
+    margin-bottom: 20px;
+  }
 
+  video, iframe.stream {
+    width: 80%;
+    max-width: 960px;
+    height: 540px;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(255,255,255,0.2);
+    margin-bottom: 30px;
+  }
 </style>
 </head>
 <body>
+  <!-- Logo del canale -->
+  <img class="logo" src="logos/20.png" alt="Nome Canale">
+
+  <!-- Nome del canale -->
   <h1>20 Mediaset</h1>
 
-  <!-- Player video -->
-  <iframe class="stream" src="https://lazzy.live/lv/it/10.php" allowfullscreen></iframe>
+  <!-- Player universale -->
+  <video id="video" controls autoplay></video>
+  <!-- Se il flusso è solo embed/iframe: -->
+  <!-- <iframe class="stream" src="LINK_PHP_O_EMBED" allowfullscreen></iframe> -->
 
-  </div>
+<script>
+  const video = document.getElementById('video');
+  const videoSrc = "https://lazzy.live/lv/it/10.php"; // Cambia solo qui
+
+  if(videoSrc.endsWith(".m3u8") && Hls.isSupported()){
+      const hls = new Hls();
+      hls.loadSource(videoSrc);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+  }
+  else if(videoSrc.endsWith(".mpd") && window.dashjs){
+      const player = dashjs.MediaPlayer().create();
+      player.initialize(video, videoSrc, true);
+  }
+  else if(videoSrc.match(/\.(mp4|mkv|webm|ts)$/i)){
+      video.src = videoSrc;
+      video.play();
+  }
+  else if(videoSrc.endsWith(".php") || videoSrc.includes("embed")){
+      // Se il flusso è solo tramite iframe
+      const iframe = document.createElement("iframe");
+      iframe.src = videoSrc;
+      iframe.className = "stream";
+      iframe.allowFullscreen = true;
+      video.parentNode.replaceChild(iframe, video);
+  }
+  else{
+      // fallback generico
+      video.src = videoSrc;
+      video.play();
+  }
+</script>
 </body>
 </html>
