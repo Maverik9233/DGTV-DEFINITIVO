@@ -29,26 +29,6 @@
     margin-bottom: 20px;
   }
 
-  .epg-container {
-    width: 720px;
-    height: 400px;
-    margin: 0 auto 40px auto;
-    border-radius: 12px;
-    overflow: hidden;
-    position: relative;
-    box-shadow: 0 0 15px rgba(0,191,255,0.3);
-  }
-
-  .epg-frame {
-    width: 100%;
-    height: 1200px; /* Aumenta se vuoi vedere più programmi */
-    border: none;
-    position: absolute;
-    top: -360px; /* Centra la programmazione */
-    left: 0;
-    transform: scale(1.02);
-  }
-
 </style>
 </head>
 <body>
@@ -78,10 +58,7 @@
       video.play();
     }
   </script>
-
-  <!-- GUIDA TV - Dazn -->
-  <div class="epg-container">
-    <iframe class="epg-frame" src="https://guidatv.org/canali/zona-dazn"></iframe>
+  
   </div>
 </body>
 </html>
