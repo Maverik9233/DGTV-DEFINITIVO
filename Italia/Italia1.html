@@ -2,7 +2,9 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>Italia1 HD</title>
+<title>Italia 1 HD</title>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
 <style>
   body {
     background: #000;
@@ -13,68 +15,72 @@
   }
 
   h1 {
-    margin: 15px 0 5px 0;
-    font-size: 22px;
-  }
-
-  /* Player video */
-  iframe.stream {
-    width: 80%;
-    max-width: 720px;
-    height: 480px;
-    border: none;
-    box-shadow: 0 0 10px rgba(255,255,255,0.2);
-    border-radius: 10px;
-  }
-
-  /* Sezione guida */
-  .epg-section {
-    margin-top: 25px;
-    color: #fff;
-  }
-
-  .epg-section h2 {
-    font-size: 20px;
-    margin-bottom: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
+    margin: 15px 0 10px 0;
+    font-size: 26px;
     color: #00bfff;
+    text-shadow: 0 0 10px rgba(0,191,255,0.6);
   }
 
-  .epg-container {
-    width: 90%;
-    max-width: 720px;
-    height: 600px;
-    margin: 0 auto 40px auto;
-    border-radius: 12px;
-    overflow: hidden;
-    position: relative;
-    box-shadow: 0 0 15px rgba(0,191,255,0.3);
+  img.logo {
+    width: 200px;
+    max-width: 30%;
+    margin-bottom: 20px;
   }
 
-  .epg-frame {
-    width: 100%;
-    height: 1300px; /* pagina più lunga per permettere il crop */
+  video, iframe.stream {
+    width: 80%;
+    max-width: 960px;
+    height: 540px;
     border: none;
-    position: absolute;
-    top: -380px; /* centratura per far vedere solo la parte della programmazione */
-    left: 0;
-    transform: scale(1.02);
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(255,255,255,0.2);
+    margin-bottom: 30px;
   }
 </style>
 </head>
 <body>
-  <h1>Italia1 HD</h1>
+  <!-- Logo del canale -->
+  <img class="logo" src="https://www.ilgiornaleditalia.it/resizer/395/-1/true/2022_04_18/Logo_Italia1-1650293410319.jpg--_dimaleinbini__da_oggi__il__nuovo__pomeriggio_di_italia1.jpg?1650293410437,png" alt="Italia 1 HD">
 
-  <!-- Player video -->
-  <iframe class="stream" src="https://juventusonair.com/lv/it/1.php" allowfullscreen></iframe>
+  <!-- Nome del canale -->
+  <h1>Italia 1 HD</h1>
 
-  <!-- Guida TV -->
-  <div class="epg-section">
-    <h2>📺 Guida TV – Italia1 HD</h2>
-    <div class="epg-container">
-      <iframe class="epg-frame" src="https://www.superguidatv.it/programmazione-canale/oggi/guida-programmi-tv-italia-1/188/"></iframe>
-    </div>
-  </div>
+  <!-- Player universale -->
+  <video id="video" controls autoplay></video>
+  <!-- Se il flusso è solo embed/iframe: -->
+  <!-- <iframe class="stream" src="LINK_PHP_O_EMBED" allowfullscreen></iframe> -->
+
+<script>
+  const video = document.getElementById('video');
+  const videoSrc = "https://juventusonair.com/lv/it/1.php"; // Cambia solo qui
+
+  if(videoSrc.endsWith(".m3u8") && Hls.isSupported()){
+      const hls = new Hls();
+      hls.loadSource(videoSrc);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+  }
+  else if(videoSrc.endsWith(".mpd") && window.dashjs){
+      const player = dashjs.MediaPlayer().create();
+      player.initialize(video, videoSrc, true);
+  }
+  else if(videoSrc.match(/\.(mp4|mkv|webm|ts)$/i)){
+      video.src = videoSrc;
+      video.play();
+  }
+  else if(videoSrc.endsWith(".php") || videoSrc.includes("embed")){
+      // Se il flusso è solo tramite iframe
+      const iframe = document.createElement("iframe");
+      iframe.src = videoSrc;
+      iframe.className = "stream";
+      iframe.allowFullscreen = true;
+      video.parentNode.replaceChild(iframe, video);
+  }
+  else{
+      // fallback generico
+      video.src = videoSrc;
+      video.play();
+  }
+</script>
 </body>
 </html>
