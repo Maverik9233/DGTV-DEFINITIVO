@@ -12,22 +12,42 @@
       margin: 0;
       font-family: Arial, sans-serif;
     }
+
     h1 {
-      font-size: 22px;
-      margin: 15px 0 5px 0;
+      font-size: 24px;
+      margin: 10px 0 20px 0;
+      color: #00bfff;
+      text-shadow: 0 0 10px rgba(0,191,255,0.6);
     }
+
+    img.logo {
+      width: 200px;
+      max-width: 30%;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(255,255,255,0.2);
+    }
+
     video {
       width: 80%;
-      max-width: 720px;
-      height: 480px;
+      max-width: 960px;
+      height: 540px;
       border: none;
       border-radius: 10px;
-      box-shadow: 0 0 10px rgba(255,255,255,0.2);
+      box-shadow: 0 0 15px rgba(255,255,255,0.3);
+      margin-bottom: 30px;
     }
   </style>
 </head>
 <body>
+  <!-- Logo del canale -->
+  <img class="logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlMEGFFjyS9ciqOFKCqRt3PfCAfFIhRZfeeAcFAtlTWzt8VN7gkU7gvY6FUg5qKkGt_g&usqp=CAU.png" alt="RSI LA1 HD">
+
+  <!-- Nome del canale -->
   <h1>RSI LA1 HD</h1>
+
+  <!-- Player DASH -->
   <video id="video" controls autoplay></video>
 
   <script>
@@ -61,6 +81,5 @@
 
     document.addEventListener('DOMContentLoaded', initApp);
   </script>
-  </div>
 </body>
 </html>
