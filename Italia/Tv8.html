@@ -1,68 +1,86 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <title>TV8 HD</title>
-  <style>
-    body {
-      background: #000;
-      color: #fff;
-      text-align: center;
-      margin: 0;
-      font-family: Arial, sans-serif;
-    }
-    h1 {
-      font-size: 22px;
-      margin: 15px 0 5px 0;
-    }
-    iframe.stream {
-      width: 720px;
-      height: 480px;
-      border: none;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(255,255,255,0.2);
-    }
-    .epg-section {
-      margin-top: 25px;
-      color: #fff;
-    }
-    .epg-section h2 {
-      font-size: 20px;
-      margin-bottom: 10px;
-      font-weight: 600;
-      text-transform: uppercase;
-      color: #00bfff;
-    }
-    .epg-container {
-      width: 90%;
-      max-width: 720px;
-      height: 400px;
-      margin: 0 auto 40px auto;
-      border-radius: 12px;
-      overflow: hidden;
-      position: relative;
-      box-shadow: 0 0 15px rgba(0,191,255,0.3);
-    }
-    .epg-frame {
-      width: 100%;
-      height: 1200px;
-      border: none;
-      position: absolute;
-      top: -350px; /* centrato sulla sezione programmazione */
-      left: 0;
-      transform: scale(1.02);
-    }
-  </style>
+<meta charset="UTF-8">
+<title>TV8 HD</title>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
+<style>
+  body {
+    background: #000;
+    color: #fff;
+    text-align: center;
+    margin: 0;
+    font-family: Arial, sans-serif;
+  }
+
+  h1 {
+    margin: 15px 0 10px 0;
+    font-size: 26px;
+    color: #00bfff;
+    text-shadow: 0 0 10px rgba(0,191,255,0.6);
+  }
+
+  img.logo {
+    width: 200px;
+    max-width: 30%;
+    margin-bottom: 20px;
+  }
+
+  video, iframe.stream {
+    width: 80%;
+    max-width: 960px;
+    height: 540px;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(255,255,255,0.2);
+    margin-bottom: 30px;
+  }
+</style>
 </head>
 <body>
-  <h1>TV8 HD</h1>
-  <iframe class="stream" src="https://lazzy.live/lv/it/tv8.php" allowfullscreen></iframe>
+  <!-- Logo del canale -->
+  <img class="logo" src="https://mediterranews.org/wp-content/uploads/2022/05/original-1.jpeg" alt="TV8 HD">
 
-  <div class="epg-section">
-    <h2>📺 Guida TV – TV8</h2>
-    <div class="epg-container">
-      <iframe class="epg-frame" src="https://www.superguidatv.it/programmazione-canale/oggi/guida-programmi-tv-tv8/237/"></iframe>
-    </div>
-  </div>
+  <!-- Nome del canale -->
+  <h1>TV8 HD</h1>
+
+  <!-- Player universale -->
+  <video id="video" controls autoplay></video>
+  <!-- Se il flusso è solo embed/iframe: -->
+  <!-- <iframe class="stream" src="LINK_PHP_O_EMBED" allowfullscreen></iframe> -->
+
+<script>
+  const video = document.getElementById('video');
+  const videoSrc = "https://lazzy.live/lv/it/tv8.php"; // Cambia solo qui
+
+  if(videoSrc.endsWith(".m3u8") && Hls.isSupported()){
+      const hls = new Hls();
+      hls.loadSource(videoSrc);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+  }
+  else if(videoSrc.endsWith(".mpd") && window.dashjs){
+      const player = dashjs.MediaPlayer().create();
+      player.initialize(video, videoSrc, true);
+  }
+  else if(videoSrc.match(/\.(mp4|mkv|webm|ts)$/i)){
+      video.src = videoSrc;
+      video.play();
+  }
+  else if(videoSrc.endsWith(".php") || videoSrc.includes("embed")){
+      // Se il flusso è solo tramite iframe
+      const iframe = document.createElement("iframe");
+      iframe.src = videoSrc;
+      iframe.className = "stream";
+      iframe.allowFullscreen = true;
+      video.parentNode.replaceChild(iframe, video);
+  }
+  else{
+      // fallback generico
+      video.src = videoSrc;
+      video.play();
+  }
+</script>
 </body>
 </html>
