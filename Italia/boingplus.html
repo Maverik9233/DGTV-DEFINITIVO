@@ -11,12 +11,14 @@
       color: #fff;
       text-align: center;
       margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: Arial, sans-serif;
     }
 
     h1 {
       font-size: 24px;
-      margin: 20px 0;
+      margin: 20px 0 10px 0;
+      color: #ff6600;
+      text-shadow: 0 0 8px rgba(255, 102, 0, 0.5);
     }
 
     video {
@@ -24,8 +26,15 @@
       max-width: 720px;
       height: auto;
       border: none;
-      outline: none;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(255, 165, 0, 0.3);
       background: #000;
+    }
+
+    footer {
+      color: #888;
+      font-size: 14px;
+      margin-top: 25px;
     }
   </style>
 </head>
@@ -35,32 +44,24 @@
 
   <script>
     const video = document.getElementById('video');
-    const videoSrc = 'https://uvotv.zappr.stream/101.m3u8'; // 🔗 Sorgente HLS
+    const videoSrc = 'https://uvotv.zappr.stream/101.m3u8'; // 🔗 flusso Boing Plus
 
     if (Hls.isSupported()) {
-      const hls = new Hls({
-        debug: false,
-      });
+      const hls = new Hls({ debug: false });
       hls.loadSource(videoSrc);
       hls.attachMedia(video);
-
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        video.play().catch(err => console.warn('Riproduzione automatica bloccata:', err));
+        video.play().catch(err => console.warn('Autoplay bloccato:', err));
       });
-
-      hls.on(Hls.Events.ERROR, (event, data) => {
-        console.error('Errore HLS:', data);
-      });
-
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
       // Safari supporta HLS nativamente
       video.src = videoSrc;
-      video.addEventListener('loadedmetadata', () => {
-        video.play().catch(err => console.warn('Autoplay bloccato:', err));
-      });
+      video.play().catch(err => console.warn('Autoplay bloccato:', err));
     } else {
       alert('Il tuo browser non supporta la riproduzione HLS.');
     }
   </script>
+
+  <footer>© 2025 Streaming Demo – Boing Plus</footer>
 </body>
 </html>
