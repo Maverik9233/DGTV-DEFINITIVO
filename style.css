@@ -1,0 +1,70 @@
+/* ===== STILE GLOBALE ===== */
+body {
+  background: #000;
+  color: #fff;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  font-family: "Arial", sans-serif;
+}
+
+/* ===== TITOLO CANALE ===== */
+h1 {
+  font-size: 32px;        /* titolo più grande */
+  color: #00bfff;
+  margin: 25px 0 15px 0;
+  text-shadow: 0 0 15px rgba(0, 191, 255, 0.7);
+}
+
+/* ===== LOGO CANALE ===== */
+.logo {
+  width: 200px;
+  height: auto;
+  margin-bottom: 15px;
+  filter: drop-shadow(0 0 15px rgba(255,255,255,0.4));
+}
+
+/* ===== CONTENITORE DEL PLAYER ===== */
+.player-container {
+  position: relative;
+  max-width: 960px;
+  width: 90%;
+  margin: 0 auto 40px auto;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 191, 255, 0.3);
+  background: #111;
+}
+
+/* ===== VIDEO O IFRAME PLAYER ===== */
+video, iframe {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9; /* mantiene proporzione 16:9 */
+  border: none;
+  border-radius: 15px;
+  display: block;
+}
+
+/* ===== LINK, BOTTONE O TESTO SECONDARIO ===== */
+a, p {
+  color: #00bfff;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+a:hover {
+  color: #fff;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 26px;
+  }
+  .logo {
+    width: 140px;
+  }
+  .player-container {
+    margin-bottom: 30px;
+  }
+}
