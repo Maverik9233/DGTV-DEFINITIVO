@@ -1,149 +1,262 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <link rel="stylesheet" href="style.css">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sky Sport 251</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Player universale - Sky Sport 251</title>
+
+  <!-- Librerie -->
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
+
   <style>
-    body {
-      background: #000;
-      color: #fff;
-      text-align: center;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
+    :root{
+      --accent:#00bfff;
+      --bg:#000;
+      --card:#0f0f0f;
+      --text:#fff;
     }
-    h1 {
-      font-size: 26px;
-      color: #00bfff;
-      text-shadow: 0 0 12px rgba(0,191,255,0.8);
-      margin-top: 15px;
-    }
-    img.logo {
-      width: 200px;
-      margin: 15px 0;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(255,255,255,0.4);
-    }
-    .player-container {
-      position: relative;
-      width: 90%;
-      max-width: 960px;
-      margin: 0 auto 30px auto;
-      padding-top: 56.25%; /* 16:9 */
-    }
-    iframe, video {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      border: 0;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(255,255,255,0.3);
-      background: #000;
-    }
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+    .wrap{max-width:1100px;margin:18px auto;padding:0 16px;text-align:center}
+    .logo{width:210px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.6);display:block;margin:8px auto}
+    h1{margin:10px 0 6px;color:var(--accent);text-shadow:0 0 10px rgba(0,191,255,0.12);font-size:26px}
+    .player-outer{position:relative;width:100%;padding-top:56.25%;margin:18px auto}
+    video, iframe { position:absolute; top:0; left:0; width:100%; height:100%; border:0; border-radius:10px; background:#000; box-shadow:0 6px 30px rgba(0,0,0,0.6) }
+    iframe{display:none}
+    video{display:block}
+    .controls { margin-top:14px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap }
+    button { background:var(--card); color:var(--text); border:1px solid #222; padding:8px 12px; border-radius:8px; cursor:pointer }
+    .status { margin-top:12px; color:#ddd; font-size:0.95rem }
+    .error { color:#ff8a8a }
   </style>
 </head>
 <body>
+  <div class="wrap">
+    <img class="logo" src="https://www.sportspro.com/wp-content/uploads/2023/04/Sky_Sports_Logo_September_2020-1.png" alt="Logo">
+    <h1>Sky Sport 251 — Player universale</h1>
 
-  <img src="https://www.sportspro.com/wp-content/uploads/2023/04/Sky_Sports_Logo_September_2020-1.png" alt="Sky Sport 251" class="logo">
-  <h1>Sky Sport 251</h1>
+    <div class="player-outer">
+      <video id="video" controls playsinline></video>
+      <iframe id="iframe" sandbox="allow-same-origin allow-scripts allow-popups allow-forms" allowfullscreen></iframe>
+    </div>
 
-  <div class="player-container">
-    <!-- Player dinamico -->
-    <video id="video" controls autoplay playsinline></video>
-    <iframe id="iframePlayer" style="display:none;" allowfullscreen></iframe>
+    <div class="controls">
+      <button id="btnRetry">Riprova (fallback)</button>
+      <button id="btnOpen">Apri in nuova finestra</button>
+      <button id="btnMute">Disattiva/Attiva audio</button>
+    </div>
+
+    <div class="status" id="status">Stato: pronto</div>
   </div>
 
-  <script>
-    const video = document.getElementById('video');
-    const iframe = document.getElementById('iframePlayer');
+<script>
+/*
+  Player universale:
+  - Prova: DIRECT -> PROXY_PRIMARY -> PROXY_FALLBACK -> IFRAME
+  - Supporta .m3u8 (HLS), .mpd (DASH), mp4/webm, php/html iframe, e file "camuffati" (.css)
+  - Modifica `originalSource` con il link che vuoi riprodurre
+  - Imposta proxyPrimary/secondary ai tuoi worker o ad altri proxy se ne hai
+*/
 
-    // 🔗 Link flusso (via proxy per maggiore compatibilità)
-    const source = "https://streamproxy.mauriziot.workers.dev/?url=https://ava.karmakurama.com/zeko/premium871/mono.css";
+const video = document.getElementById('video');
+const iframe = document.getElementById('iframe');
+const statusEl = document.getElementById('status');
+const btnRetry = document.getElementById('btnRetry');
+const btnOpen = document.getElementById('btnOpen');
+const btnMute = document.getElementById('btnMute');
 
-    function loadStream(src) {
-      const lower = src.toLowerCase();
+let isMuted = false;
 
-      // 🎬 Twitch
-      if (lower.includes("twitch.tv")) {
-        iframe.src = src.includes("parent=") ? src : src + "&parent=maverik9233.github.io";
-        video.style.display = "none";
-        iframe.style.display = "block";
-      }
+// === CONFIG ===
+const originalSource = "https://ava.karmakurama.com/zeko/premium871/mono.css"; // cambia qui
+const proxyPrimary  = "https://streamproxy.mauriziot.workers.dev/?url=";
+const proxyFallback = "https://streamproxy.mauriziot.workers.dev/?url="; // puoi aggiungerne un altro se vuoi
 
-      // 🎮 Kick
-      else if (lower.includes("kick.com")) {
-        iframe.src = "https://player.kick.com/" + src.split("kick.com/")[1];
-        video.style.display = "none";
-        iframe.style.display = "block";
-      }
+// === HELPERS ===
+function setStatus(txt, isError=false){
+  statusEl.innerHTML = (isError?'<span class="error">':'') + 'Stato: ' + txt + (isError?'</span>':'');
+  console.log('PLAYER:',txt);
+}
+function proxify(url, proxy) {
+  return proxy + encodeURIComponent(url);
+}
+function isHLS(url){ return /\.m3u8(\?.*)?$/.test(url); }
+function isDASH(url){ return /\.mpd(\?.*)?$/.test(url); }
+function isVideoFile(url){ return /\.(mp4|mkv|webm)(\?.*)?$/.test(url); }
+function looksLikeIframe(url){ return url.endsWith('.php') || url.endsWith('.html') || url.endsWith('.htm') || url.includes('twitch.tv') || url.includes('kick.com') || url.includes('player.twitch.tv'); }
 
-      // 🎞️ HLS (.m3u8)
-      else if (src.endsWith(".m3u8")) {
+// === CORE: attempt chain ===
+const attempts = [];
+function buildAttempts(orig) {
+  attempts.length = 0;
+  // 1) try direct (if scheme allowed)
+  attempts.push({type:'direct', url:orig});
+
+  // 2) if .css or suspicious, try proxied HLS
+  attempts.push({type:'proxy', url: proxify(orig, proxyPrimary)});
+
+  // 3) fallback proxy (same here; replace if you have another proxy)
+  attempts.push({type:'proxy', url: proxify(orig, proxyFallback)});
+
+  // 4) iframe fallback (open page)
+  attempts.push({type:'iframe', url: orig});
+}
+
+let currentAttempt = 0;
+let hlsInstance = null;
+let dashPlayer = null;
+
+async function tryNext() {
+  if (currentAttempt >= attempts.length) {
+    setStatus('Tutti i tentativi falliti — prova un altro link o apri in un player esterno', true);
+    showIframe(originalSource); // ultima chance
+    return;
+  }
+
+  const attempt = attempts[currentAttempt++];
+  setStatus(`Tentativo ${currentAttempt}/${attempts.length}: ${attempt.type} → ${attempt.url}`);
+
+  // cleanup previous
+  cleanupPlayers();
+
+  try {
+    if (attempt.type === 'direct' || attempt.type === 'proxy') {
+      const url = attempt.url;
+
+      // HLS path
+      if (isHLS(url) || url.toLowerCase().endsWith('.css')) {
+        // try HLS.js with the given url
         if (Hls.isSupported()) {
-          const hls = new Hls();
-          hls.loadSource(src);
-          hls.attachMedia(video);
-          hls.on(Hls.Events.MANIFEST_PARSED, () => {
-            video.muted = false;
+          hlsInstance = new Hls({ maxBufferLength: 30 });
+          hlsInstance.on(Hls.Events.ERROR, (event, data) => {
+            const isFatal = data && data.fatal;
+            console.warn('HLS.js error', data);
+            if (isFatal) {
+              hlsInstance.destroy();
+              hlsInstance = null;
+              setTimeout(tryNext, 250); // try next option
+            }
+          });
+          hlsInstance.loadSource(url);
+          hlsInstance.attachMedia(video);
+          // wait manifest parsed a short time
+          hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => {
+            video.style.display='block';
+            iframe.style.display='none';
+            video.muted = isMuted;
             video.volume = 1.0;
-            video.play();
+            video.play().catch(()=>{});
+            setStatus('Riproduzione avviata (HLS)');
           });
         } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-          video.src = src;
-          video.play();
-        }
-      }
-
-      // 📦 DASH (.mpd)
-      else if (src.endsWith(".mpd")) {
-        const player = dashjs.MediaPlayer().create();
-        player.initialize(video, src, true);
-      }
-
-      // 🎥 MP4, MKV, WEBM
-      else if (src.match(/\.(mp4|mkv|webm)$/)) {
-        video.src = src;
-        video.play();
-      }
-
-      // 🧩 CSS o flussi “strani” (proxy o fallback)
-      else if (src.endsWith(".css")) {
-        const proxied = "https://streamproxy.mauriziot.workers.dev/?url=" + encodeURIComponent(src);
-        if (Hls.isSupported()) {
-          const hls = new Hls();
-          hls.loadSource(proxied);
-          hls.attachMedia(video);
-          hls.on(Hls.Events.MANIFEST_PARSED, () => {
-            video.muted = false;
-            video.volume = 1.0;
-            video.play();
+          video.src = url;
+          video.play().then(()=> setStatus('Riproduzione avviata (HLS nativo)')).catch(e=>{
+            console.warn(e);
+            setTimeout(tryNext, 200);
           });
         } else {
-          video.src = proxied;
-          video.play();
+          // no HLS support -> go next
+          setTimeout(tryNext, 200);
+        }
+        return;
+      }
+
+      // DASH path
+      if (isDASH(url)) {
+        try {
+          dashPlayer = dashjs.MediaPlayer().create();
+          dashPlayer.initialize(video, url, true);
+          setStatus('Riproduzione avviata (DASH)');
+          return;
+        } catch(e){
+          console.warn('DASH error', e);
+          setTimeout(tryNext,200);
+          return;
         }
       }
 
-      // 🌐 PHP o HTML o altro
-      else if (src.endsWith(".php") || src.endsWith(".html") || src.endsWith(".htm") || src.startsWith("http")) {
-        iframe.src = src;
-        video.style.display = "none";
-        iframe.style.display = "block";
+      // direct video file (mp4/mkv/webm)
+      if (isVideoFile(url)) {
+        video.src = url;
+        video.play().then(()=> setStatus('Riproduzione avviata (file)')).catch(()=>{
+          setTimeout(tryNext,200);
+        });
+        return;
       }
 
-      // ❓ Fallback finale
-      else {
-        iframe.src = src;
-        video.style.display = "none";
-        iframe.style.display = "block";
+      // otherwise try to load as HLS (some php/css endpoints actually return HLS)
+      // try HLS once more
+      if (Hls.isSupported()) {
+        hlsInstance = new Hls();
+        hlsInstance.loadSource(url);
+        hlsInstance.attachMedia(video);
+        hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => {
+          video.style.display='block';
+          iframe.style.display='none';
+          video.muted = isMuted;
+          video.volume = 1.0;
+          video.play().catch(()=>{});
+          setStatus('Riproduzione avviata (HLS fallback)');
+        });
+        hlsInstance.on(Hls.Events.ERROR, () => {
+          hlsInstance.destroy();
+          hlsInstance = null;
+          setTimeout(tryNext,200);
+        });
+        return;
       }
+
+      // final fallback for this attempt: go next
+      setTimeout(tryNext, 200);
+      return;
     }
 
-    loadStream(source);
-  </script>
+    if (attempt.type === 'iframe') {
+      showIframe(attempt.url);
+      setStatus('Aperto in iframe come ultima risorsa');
+      return;
+    }
+  } catch (err) {
+    console.error('Errore during attempt:', err);
+    setTimeout(tryNext, 200);
+  }
+}
+
+function cleanupPlayers(){
+  // Hls
+  try { if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; } } catch(e){}
+  // dash
+  try { if (dashPlayer) { dashPlayer.reset(); dashPlayer = null; } } catch(e){}
+  // stop video
+  try { video.pause(); video.removeAttribute('src'); video.load(); } catch(e){}
+}
+
+function showIframe(url) {
+  iframe.src = url;
+  iframe.style.display = 'block';
+  video.style.display = 'none';
+}
+
+// === actions
+btnRetry.addEventListener('click', () => {
+  setStatus('Riprovo manualmente...');
+  currentAttempt = 0;
+  buildAttempts(originalSource);
+  tryNext();
+});
+btnOpen.addEventListener('click', () => {
+  window.open(originalSource, '_blank');
+});
+btnMute.addEventListener('click', () => {
+  isMuted = !isMuted;
+  video.muted = isMuted;
+  btnMute.textContent = isMuted ? 'Audio: Off' : 'Audio: On';
+});
+
+// auto-start
+buildAttempts(originalSource);
+tryNext();
+
+</script>
 </body>
 </html>
