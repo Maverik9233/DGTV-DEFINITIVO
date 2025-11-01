@@ -1,87 +1,132 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<title>Dazn 1</title>
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-<style>
-  body {
-    background: #000;
-    color: #fff;
-    text-align: center;
-    margin: 0;
-    font-family: Arial, sans-serif;
-  }
-
-  h1 {
-    font-size: 22px;
-    margin: 15px 10px 10px 10px;
-    color: #00bfff;
-    text-shadow: 0 0 10px rgba(0,191,255,0.6);
-  }
-
-  video, iframe.stream {
-    width: 720px;
-    height: 480px;
-    border: none;
-    border-radius: 10px;
-    box-shadow: 0 0 15px rgba(255,255,255,0.3);
-    margin-bottom: 20px;
-  }
-
-  .epg-container {
-    width: 720px;
-    height: 400px;
-    margin: 0 auto 40px auto;
-    border-radius: 12px;
-    overflow: hidden;
-    position: relative;
-    box-shadow: 0 0 15px rgba(0,191,255,0.3);
-  }
-
-  .epg-frame {
-    width: 100%;
-    height: 1200px; /* Aumenta se vuoi vedere più programmi */
-    border: none;
-    position: absolute;
-    top: -360px; /* Centra la programmazione */
-    left: 0;
-    transform: scale(1.02);
-  }
-
-</style>
+  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dazn 1</title>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
+  <style>
+    body {
+      background: #000;
+      color: #fff;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+    h1 {
+      font-size: 22px;
+      color: #00bfff;
+      text-shadow: 0 0 10px rgba(0,191,255,0.6);
+      margin-top: 20px;
+    }
+    img.logo {
+      width: 180px;
+      margin: 15px 0;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(255,255,255,0.3);
+    }
+    .player-container {
+      position: relative;
+      width: 90%;
+      max-width: 960px;
+      margin: 0 auto 30px auto;
+      padding-top: 56.25%; /* proporzione 16:9 */
+    }
+    iframe, video {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      border: 0;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(255,255,255,0.3);
+      background: #000;
+    }
+  </style>
 </head>
 <body>
-  <h1>Dazn 1</h1>
 
-  <!-- STREAM VIDEO UNIVERSALE -->
-  <!-- Scegli tra video HLS/DASH o iframe PHP -->
-  <video id="video" controls autoplay></video>
-  <!-- <iframe class="stream" src="INSERISCI_LINK_PHP_O_ALTRO" allowfullscreen></iframe> -->
+  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ93BS7a4iQ8Lr5qappuk0FK3SghvXm5t7oUDxeIb41rA&s.png" alt="Zona Dazn" class="logo">
+  <h1> Dazn 1</h1>
+
+  <div class="player-container">
+    <!-- Player dinamico -->
+    <video id="video" controls autoplay playsinline muted></video>
+    <iframe id="iframePlayer" style="display:none;" allowfullscreen></iframe>
+  </div>
 
   <script>
     const video = document.getElementById('video');
-    const videoSrc = 'http://human2028netest.blogdns.net:80/live/00:c3:f4:ab:ee:fd/fENMfmX7/16711.m3u8'; // Inserisci il tuo link .m3u8, .mpd, ts ecc.
+    const iframe = document.getElementById('iframePlayer');
 
-    // Se è un HLS o MPD
-    if (videoSrc.endsWith('.m3u8') && Hls.isSupported()) {
-      const hls = new Hls();
-      hls.loadSource(videoSrc);
-      hls.attachMedia(video);
-      hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
-    } else if (videoSrc.endsWith('.mpd') && window.dashjs) {
-      const player = dashjs.MediaPlayer().create();
-      player.initialize(video, videoSrc, true);
-    } else {
-      // fallback iframe o compatibilità browser nativa
-      video.src = videoSrc;
-      video.play();
+    // INSERISCI QUI IL TUO LINK (Twitch, Kick, M3U8, MPD, ecc)
+    const source = "chrome-extension://opmeopcambhfimffbomjgemehjkbbmji/pages/player.html#https://dck-ac-live.cdn.indazn.com/dash/dazn-linear-583/stream.mpd?ck=eyJjZmI1ZTJiNzNiZWY0ZjNjODc4ZjI1YWI4NmE3NDUxZiI6IjBkNjcxMmJmMmE4NGVkY2M5M2QwMDFhOTYxM2Y2ZmVjIn0
+";
+
+    function loadStream(src) {
+      const lower = src.toLowerCase();
+
+      // 🎬 Se è Twitch
+      if (lower.includes("twitch.tv")) {
+        iframe.src = src.includes("parent=") ? src : src + "&parent=maverik9233.github.io";
+        video.style.display = "none";
+        iframe.style.display = "block";
+      }
+
+      // 🎮 Se è Kick
+      else if (lower.includes("kick.com")) {
+        iframe.src = "https://player.kick.com/" + src.split("kick.com/")[1];
+        video.style.display = "none";
+        iframe.style.display = "block";
+      }
+
+      // 🎞️ Se è flusso HLS (.m3u8)
+      else if (src.endsWith(".m3u8")) {
+        if (Hls.isSupported()) {
+          const hls = new Hls();
+          hls.loadSource(src);
+          hls.attachMedia(video);
+          hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            video.muted = false;
+            video.volume = 1.0;
+            video.play();
+          });
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+          video.src = src;
+          video.play();
+        }
+      }
+
+      // 📦 Se è flusso DASH (.mpd)
+      else if (src.endsWith(".mpd")) {
+        const player = dashjs.MediaPlayer().create();
+        player.initialize(video, src, true);
+      }
+
+      // 🎥 Se è MP4, MKV, o file video diretto
+      else if (src.match(/\.(mp4|mkv|webm)$/)) {
+        video.src = src;
+        video.play();
+      }
+
+      // 🌐 Se è PHP o pagina web
+      else if (src.endsWith(".php") || src.startsWith("http")) {
+        iframe.src = src;
+        video.style.display = "none";
+        iframe.style.display = "block";
+      }
+
+      // ❓ Altrimenti fallback iframe
+      else {
+        iframe.src = src;
+        video.style.display = "none";
+        iframe.style.display = "block";
+      }
     }
-  </script>
 
-  <!-- GUIDA TV - Dazn 1 -->
-  <div class="epg-container">
-    <iframe class="epg-frame" src="https://guidatv.org/canali/zona-dazn"></iframe>
-  </div>
+    loadStream(source);
+  </script>
 </body>
 </html>
