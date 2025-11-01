@@ -4,7 +4,7 @@
   <link rel="stylesheet" href="style.css">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title> Sky sport 251</title>
+  <title>Sky Sport 251</title>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
   <style>
@@ -17,23 +17,23 @@
       font-family: Arial, sans-serif;
     }
     h1 {
-      font-size: 22px;
+      font-size: 26px;
       color: #00bfff;
-      text-shadow: 0 0 10px rgba(0,191,255,0.6);
-      margin-top: 20px;
+      text-shadow: 0 0 12px rgba(0,191,255,0.8);
+      margin-top: 15px;
     }
     img.logo {
-      width: 180px;
+      width: 200px;
       margin: 15px 0;
       border-radius: 12px;
-      box-shadow: 0 0 15px rgba(255,255,255,0.3);
+      box-shadow: 0 0 15px rgba(255,255,255,0.4);
     }
     .player-container {
       position: relative;
       width: 90%;
       max-width: 960px;
       margin: 0 auto 30px auto;
-      padding-top: 56.25%; /* proporzione 16:9 */
+      padding-top: 56.25%; /* 16:9 */
     }
     iframe, video {
       position: absolute;
@@ -48,12 +48,12 @@
 </head>
 <body>
 
-  <img src="https://www.sportspro.com/wp-content/uploads/2023/04/Sky_Sports_Logo_September_2020-1.png" alt="Sky sport 251" class="logo">
-  <h1> Sky sport 251</h1>
+  <img src="https://www.sportspro.com/wp-content/uploads/2023/04/Sky_Sports_Logo_September_2020-1.png" alt="Sky Sport 251" class="logo">
+  <h1>Sky Sport 251</h1>
 
   <div class="player-container">
     <!-- Player dinamico -->
-    <video id="video" controls autoplay playsinline muted></video>
+    <video id="video" controls autoplay playsinline></video>
     <iframe id="iframePlayer" style="display:none;" allowfullscreen></iframe>
   </div>
 
@@ -61,27 +61,27 @@
     const video = document.getElementById('video');
     const iframe = document.getElementById('iframePlayer');
 
-    // INSERISCI QUI IL TUO LINK (Twitch, Kick, M3U8, MPD, ecc)
-    const source = "http://human2028netest.blogdns.net:80/live/00:c3:f4:ab:ee:fd/fENMfmX7/16706.m3u8";
+    // 🔗 Link flusso (via proxy per maggiore compatibilità)
+    const source = "https://streamproxy.mauriziot.workers.dev/?url=https://ava.karmakurama.com/zeko/premium871/mono.css";
 
     function loadStream(src) {
       const lower = src.toLowerCase();
 
-      // 🎬 Se è Twitch
+      // 🎬 Twitch
       if (lower.includes("twitch.tv")) {
         iframe.src = src.includes("parent=") ? src : src + "&parent=maverik9233.github.io";
         video.style.display = "none";
         iframe.style.display = "block";
       }
 
-      // 🎮 Se è Kick
+      // 🎮 Kick
       else if (lower.includes("kick.com")) {
         iframe.src = "https://player.kick.com/" + src.split("kick.com/")[1];
         video.style.display = "none";
         iframe.style.display = "block";
       }
 
-      // 🎞️ Se è flusso HLS (.m3u8)
+      // 🎞️ HLS (.m3u8)
       else if (src.endsWith(".m3u8")) {
         if (Hls.isSupported()) {
           const hls = new Hls();
@@ -98,26 +98,44 @@
         }
       }
 
-      // 📦 Se è flusso DASH (.mpd)
+      // 📦 DASH (.mpd)
       else if (src.endsWith(".mpd")) {
         const player = dashjs.MediaPlayer().create();
         player.initialize(video, src, true);
       }
 
-      // 🎥 Se è MP4, MKV, o file video diretto
+      // 🎥 MP4, MKV, WEBM
       else if (src.match(/\.(mp4|mkv|webm)$/)) {
         video.src = src;
         video.play();
       }
 
-      // 🌐 Se è PHP o pagina web
-      else if (src.endsWith(".php") || src.startsWith("http")) {
+      // 🧩 CSS o flussi “strani” (proxy o fallback)
+      else if (src.endsWith(".css")) {
+        const proxied = "https://streamproxy.mauriziot.workers.dev/?url=" + encodeURIComponent(src);
+        if (Hls.isSupported()) {
+          const hls = new Hls();
+          hls.loadSource(proxied);
+          hls.attachMedia(video);
+          hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            video.muted = false;
+            video.volume = 1.0;
+            video.play();
+          });
+        } else {
+          video.src = proxied;
+          video.play();
+        }
+      }
+
+      // 🌐 PHP o HTML o altro
+      else if (src.endsWith(".php") || src.endsWith(".html") || src.endsWith(".htm") || src.startsWith("http")) {
         iframe.src = src;
         video.style.display = "none";
         iframe.style.display = "block";
       }
 
-      // ❓ Altrimenti fallback iframe
+      // ❓ Fallback finale
       else {
         iframe.src = src;
         video.style.display = "none";
